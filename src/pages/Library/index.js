@@ -111,7 +111,7 @@ class Index extends Component {
             
             <div>
 
-                <Header as='h3' content='My Library' style={style.h3} textAlign='center' />
+                <Header as='h2' content='My Library' style={style.h3} textAlign='center' />
                 
                 <Container>
 
