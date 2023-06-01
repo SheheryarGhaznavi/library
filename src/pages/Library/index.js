@@ -96,55 +96,60 @@ class Index extends Component {
             
             <div>
 
-                <Header as='h2' content='My Library' style={style.h3} textAlign='center' />
                 
-                <Container>
+                {   (this.state.books).length ? 
+                    <Container>
+                        <Header as='h2' content='My Library' style={style.h3} textAlign='center' />
 
-                    {   (this.state.books).length ? 
-                        <Grid container columns={3} doubling stackable >
+                            <Grid container columns={3} doubling stackable >
 
-                            {
-                                (this.state.books).map((book, key) => {
-                                    return (
+                                {
+                                    (this.state.books).map((book, key) => {
+                                        return (
 
-                                        <Grid.Column key={key}>
-                                            <Item.Group divided>
-                                                <Item>
-                                                    <Item.Image src={book.image} />
-                                                    <Item.Content>
-                                                        <Item.Header>{book.title}</Item.Header>
-                                                        <Item.Description>
-                                                            {book.author}
-                                                        </Item.Description>
-                                                        <Item.Description>
-                                                            { (book.genre).length > 20 ? (book.genre).substring(0,20) : book.genre }
-                                                        </Item.Description>
-                                                        <Item.Extra>
+                                            <Grid.Column key={key}>
+                                                <Item.Group divided>
+                                                    <Item>
+                                                        <Item.Image src={book.image} />
+                                                        <Item.Content>
+                                                            <Item.Header>{book.title}</Item.Header>
+                                                            <Item.Description>
+                                                                {book.author}
+                                                            </Item.Description>
+                                                            <Item.Description>
+                                                                { book.genre && (book.genre).length > 20 ? (book.genre).substring(0,20) : book.genre }
+                                                            </Item.Description>
+                                                            <Item.Extra>
 
-                                                            { book.is_read ?
-                                                                <Button size='small' onClick={() => {this.updateBook(book.id, false)}} color='teal'>
-                                                                    Mark as UnRead
-                                                                </Button> 
-                                                            :
-                                                                <Button size='small' onClick={() => {this.updateBook(book.id, true)}} primary>
-                                                                    Mark as Read
-                                                                </Button>
-                                                            }
-                                                        </Item.Extra>
-                                                    </Item.Content>
-                                                </Item>
-                                            </Item.Group>
-                                        </Grid.Column>
+                                                                { book.is_read ?
+                                                                    <Button size='small' onClick={() => {this.updateBook(book.id, false)}} color='teal'>
+                                                                        Mark as UnRead
+                                                                    </Button> 
+                                                                :
+                                                                    <Button size='small' onClick={() => {this.updateBook(book.id, true)}} primary>
+                                                                        Mark as Read
+                                                                    </Button>
+                                                                }
+                                                            </Item.Extra>
+                                                        </Item.Content>
+                                                    </Item>
+                                                </Item.Group>
+                                            </Grid.Column>
 
-                                    )
-                                }) 
-                            }
+                                        )
+                                    }) 
+                                }
 
-                        </Grid>
-                        : ''}
+                            </Grid>
 
-                        
-                </Container>
+                            
+                    </Container>
+                : 
+                    <Container>
+                        <Header as='h2' content='Login to see your saved Library' style={style.h3} textAlign='center' />
+                    
+                    </Container>
+                }
 
             </div>
         );

@@ -12,10 +12,6 @@ class Index extends Component {
         };
     };
 
-    async componentDidMount() {
-          
-    }
-
     render() {
 
         return (

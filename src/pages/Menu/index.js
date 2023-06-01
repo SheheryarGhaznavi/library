@@ -125,6 +125,7 @@ class Index extends Component {
                 console.log(response);
                 this.setState({open: false});
                 ls.set('token', response.data.data.token);
+                window.location.reload();
 
             })
             .catch(function (error) {
