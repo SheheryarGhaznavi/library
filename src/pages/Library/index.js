@@ -101,7 +101,7 @@ class Index extends Component {
                 <Container>
 
                     {   (this.state.books).length ? 
-                        <Grid container columns={3} divided='horizontally' >
+                        <Grid container columns={3} doubling stackable >
 
                             {
                                 (this.state.books).map((book, key) => {
