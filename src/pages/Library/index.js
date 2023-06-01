@@ -33,30 +33,60 @@ class Index extends Component {
         this.state = {
           books: [],
         };
+        this.updateBook = this.updateBook.bind(this);
     };
 
     async componentDidMount() {
           
         try {
 
-            let token = ls.get('token');
-
-            if (token) {
-                
-                axios.get(`http://127.0.0.1:8000/api/books`, { headers: { 'Authorization': `Bearer ${token}` } })
-                .then( response => {
-                    // handle success
-                    console.log(response.data);
-                    this.setState({ books: response.data.data });
-                })
-                .catch(function (error) {
-                    // handle error
-                    console.log(error);
-                }); 
-            }
+            this.getMovies();
             
         } catch(e) {
             // this.props.appProps.setAlert(true,e.message,"danger");
+        }
+    }
+
+    updateBook(id, read) {
+        
+        let token = ls.get('token');
+
+        if (token) {
+            
+            let body = {
+                id : id,
+                read : read
+            };
+            
+            axios.post(`http://127.0.0.1:8000/api/books/update-readability`, body, { headers: { 'Authorization': `Bearer ${token}` } })
+            .then( response => {
+                // handle success
+                this.getMovies();
+            })
+            .catch(function (error) {
+                // handle error
+                console.log(error);
+            }); 
+        } else {
+            alert('you need to login to used this functionality');
+        }
+    }
+
+    getMovies() {
+        let token = ls.get('token');
+
+        if (token) {
+            
+            axios.get(`http://127.0.0.1:8000/api/books`, { headers: { 'Authorization': `Bearer ${token}` } })
+            .then( response => {
+                // handle success
+                console.log(response.data);
+                this.setState({ books: response.data.data });
+            })
+            .catch(function (error) {
+                // handle error
+                console.log(error);
+            }); 
         }
     }
 
@@ -91,12 +121,12 @@ class Index extends Component {
                                                         </Item.Description>
                                                         <Item.Extra>
 
-                                                            { book.read ?
-                                                                <Button size='small' color='teal'>
+                                                            { book.is_read ?
+                                                                <Button size='small' onClick={() => {this.updateBook(book.id, false)}} color='teal'>
                                                                     Mark as UnRead
                                                                 </Button> 
                                                             :
-                                                                <Button size='small' primary>
+                                                                <Button size='small' onClick={() => {this.updateBook(book.id, true)}} primary>
                                                                     Mark as Read
                                                                 </Button>
                                                             }

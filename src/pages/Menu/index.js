@@ -93,7 +93,7 @@ class Index extends Component {
                 // handle success
                 console.log(response);
                 alert(response.data.message);
-                
+                window.location.reload();
             })
             .catch(function (error) {
                 // handle error
