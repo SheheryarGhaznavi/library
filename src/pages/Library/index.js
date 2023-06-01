@@ -1,4 +1,6 @@
 import React, { Component } from 'react';
+import ls from 'local-storage';
+import axios from "axios";
 import {
     Container,
     Grid,
@@ -37,69 +39,22 @@ class Index extends Component {
           
         try {
 
-            let books = [
-                {
-                    "title" : "Book 1",
-                    "author" : "Author 1",
-                    "genre" : "Genre 1, Genre 2",
-                    "image" : "https://react.semantic-ui.com/images/wireframe/image.png",
-                    "read" : true,
-                },
-                {
-                    "title" : "Book 1",
-                    "author" : "Author 1",
-                    "genre" : "Genre 1, Genre 2",
-                    "image" : "https://react.semantic-ui.com/images/wireframe/image.png",
-                    "read" : true,
-                },
-                {
-                    "title" : "Book 1",
-                    "author" : "Author 1",
-                    "genre" : "Genre 1, Genre 2",
-                    "image" : "https://react.semantic-ui.com/images/wireframe/image.png",
-                    "read" : true,
-                },
-                {
-                    "title" : "Book 1",
-                    "author" : "Author 1",
-                    "genre" : "Genre 1, Genre 2",
-                    "image" : "https://react.semantic-ui.com/images/wireframe/image.png",
-                    "read" : true,
-                },
-                {
-                    "title" : "Book 1",
-                    "author" : "Author 1",
-                    "genre" : "Genre 1, Genre 2",
-                    "image" : "https://react.semantic-ui.com/images/wireframe/image.png",
-                    "read" : true,
-                },
-                {
-                    "title" : "Book 1",
-                    "author" : "Author 1",
-                    "genre" : "Genre 1, Genre 2",
-                    "image" : "https://react.semantic-ui.com/images/wireframe/image.png",
-                    "read" : true,
-                },
-                {
-                    "title" : "Book 1",
-                    "author" : "Author 1",
-                    "genre" : "Genre 1, Genre 2",
-                    "image" : "https://react.semantic-ui.com/images/wireframe/image.png",
-                    "read" : true,
-                },
-                {
-                    "title" : "Book 1",
-                    "author" : "Author 1",
-                    "genre" : "Genre 1, Genre 2",
-                    "image" : "https://react.semantic-ui.com/images/wireframe/image.png",
-                    "read" : true,
-                }
-            ];
-            
-            this.setState({
-                books: books,
-            });
+            let token = ls.get('token');
 
+            if (token) {
+                
+                axios.get(`http://127.0.0.1:8000/api/books`, { headers: { 'Authorization': `Bearer ${token}` } })
+                .then( response => {
+                    // handle success
+                    console.log(response.data);
+                    this.setState({ books: response.data.data });
+                })
+                .catch(function (error) {
+                    // handle error
+                    console.log(error);
+                }); 
+            }
+            
         } catch(e) {
             // this.props.appProps.setAlert(true,e.message,"danger");
         }
@@ -115,46 +70,48 @@ class Index extends Component {
                 
                 <Container>
 
-                    <Grid container columns={3} divided='vertically' celled >
+                    {   (this.state.books).length ? 
+                        <Grid container columns={3} divided='horizontally' >
 
-                        {
-                            this.state.books.map((book, key) => {
-                                return (
+                            {
+                                (this.state.books).map((book, key) => {
+                                    return (
 
-                                    <Grid.Column key={key}>
-                                        <Item.Group divided>
-                                            <Item>
-                                                <Item.Image src={book.image} />
-                                                <Item.Content>
-                                                    <Item.Header>{book.title}</Item.Header>
-                                                    <Item.Description>
-                                                        {book.author}
-                                                    </Item.Description>
-                                                    <Item.Description>
-                                                        {book.genre}
-                                                    </Item.Description>
-                                                    <Item.Extra>
+                                        <Grid.Column key={key}>
+                                            <Item.Group divided>
+                                                <Item>
+                                                    <Item.Image src={book.image} />
+                                                    <Item.Content>
+                                                        <Item.Header>{book.title}</Item.Header>
+                                                        <Item.Description>
+                                                            {book.author}
+                                                        </Item.Description>
+                                                        <Item.Description>
+                                                            { (book.genre).length > 20 ? (book.genre).substring(0,20) : book.genre }
+                                                        </Item.Description>
+                                                        <Item.Extra>
 
-                                                        { book.read ?
-                                                            <Button size='small' color='teal'>
-                                                                Mark as UnRead
-                                                            </Button> 
-                                                        :
-                                                            <Button size='small' primary>
-                                                                Mark as Read
-                                                            </Button>
-                                                        }
-                                                    </Item.Extra>
-                                                </Item.Content>
-                                            </Item>
-                                        </Item.Group>
-                                    </Grid.Column>
+                                                            { book.read ?
+                                                                <Button size='small' color='teal'>
+                                                                    Mark as UnRead
+                                                                </Button> 
+                                                            :
+                                                                <Button size='small' primary>
+                                                                    Mark as Read
+                                                                </Button>
+                                                            }
+                                                        </Item.Extra>
+                                                    </Item.Content>
+                                                </Item>
+                                            </Item.Group>
+                                        </Grid.Column>
 
-                                )
-                            }) 
-                        }
+                                    )
+                                }) 
+                            }
 
-                    </Grid>
+                        </Grid>
+                        : ''}
 
                         
                 </Container>

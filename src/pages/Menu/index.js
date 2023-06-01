@@ -1,10 +1,17 @@
 import React, { Component } from 'react';
 import axios from "axios";
+import ls from 'local-storage';
 import {
     Container,
     Menu,
     Search,
     Grid,
+    Modal,
+    Button,
+    Icon,
+    Header,
+    Form,
+    Input,
 } from 'semantic-ui-react'
 
 class Index extends Component {
@@ -14,17 +21,21 @@ class Index extends Component {
         
         this.state = {
           books: [],
-          loading : false
+          loading : false,
+          open : false,
+          email : "",
+          password : "",
+          token : ls.get('token'),
         };
 
         this.handleSearchChange = this.handleSearchChange.bind(this);
+        this.openLoginModal = this.openLoginModal.bind(this);
+        this.login = this.login.bind(this);
     };
 
     handleSearchChange(event, value) {
-        console.log("value");
-        console.log(value);
+
         this.setState({loading: true});
-        // console.log(this.state.books);
 
         axios.get(`https://openlibrary.org/search.json?q=${value.value}&fields=title,author_name,subject&limit=5`)
         .then( response => {
@@ -35,7 +46,10 @@ class Index extends Component {
             // handle error
             console.log(error);
         });        
-        
+    }
+
+    openLoginModal() {
+        this.setState({open: true});
     }
 
 
@@ -61,9 +75,68 @@ class Index extends Component {
 
 
 
-    resultSelected(value) {
-        console.log("result selected");
-        console.log(value);
+    resultSelected(book) {
+
+        let token = ls.get('token');
+
+        if (token) {
+            
+            let body = {
+                title : book.title,
+                author : book.author,
+                genre : book.genre,
+                image : book.image
+            };
+    
+            axios.post(`http://127.0.0.1:8000/api/books/create`, body, { headers: { 'Authorization': `Bearer ${token}` } })
+            .then( response => {
+                // handle success
+                console.log(response);
+                alert(response.data.message);
+                
+            })
+            .catch(function (error) {
+                // handle error
+                alert(error.response.data.message);
+            });
+
+        } else {
+            alert('you need to login first to add this book ');
+        }
+
+    }
+
+
+
+    login() {
+
+        axios.get(`http://127.0.0.1:8000/sanctum/csrf-cookie`)
+        .then( response => {
+            // handle success
+
+            let body = {
+                email : this.state.email,
+                password : this.state.password
+            }
+
+            axios.post(`http://127.0.0.1:8000/api/auth/login`, body)
+            .then( response => {
+                // handle success
+                console.log(response);
+                this.setState({open: false});
+                ls.set('token', response.data.data.token);
+
+            })
+            .catch(function (error) {
+                // handle error
+                alert(error.response.data.message);
+            });  
+
+        })
+        .catch(function (error) {
+            // handle error
+            console.log(error);
+        });  
     }
 
 
@@ -98,11 +171,42 @@ class Index extends Component {
                                 </Grid>
                             </Menu.Item>
 
+
+
                         </Menu.Menu>
 
-                        
+                        {this.state.token ? '' : <Menu.Item name='login' onClick={this.openLoginModal} /> }
+
                     </Container>
                 </Menu>
+
+
+
+                <Modal
+                    basic
+                    onClose={() => this.setState({open: false}) }
+                    onOpen={() => this.setState({open: true})}
+                    open={this.state.open}
+                    size='small'
+                    >
+                    <Header icon>
+                        <Icon name='archive' />
+                        Login
+                    </Header>
+                    <Modal.Content>
+                        
+                        <Form>
+                            <Form.Field>
+                                <Input type='email' value={this.state.email} onChange={(e, target) => this.setState({email: target.value})} label='Email' placeholder='abc@gmail.com' />
+                            </Form.Field>
+                            <Form.Field>
+                                <Input type='password' value={this.state.password} onChange={(e, target) => this.setState({password: target.value})} label='Password' placeholder='*******' />
+                            </Form.Field>
+                            <Button color='green' inverted type='submit' onClick={this.login}>Login</Button>
+                            <Button color='red' inverted onClick={() => this.setState({open: false})}>Close</Button>
+                        </Form>
+                    </Modal.Content>
+                </Modal>
 
             </div>
         );
